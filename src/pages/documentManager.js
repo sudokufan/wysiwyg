@@ -20,6 +20,7 @@ const DocumentManager = () => {
   const [editingTitle, setEditingTitle] = useState("");
   const [editingText, setEditingText] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDocument, setShowDocument] = useState(null);
 
   const addDocument = () => {
     const updatedDocuments = handleAddDocument(
@@ -107,10 +108,34 @@ const DocumentManager = () => {
               </>
             ) : (
               <>
-                <h3>{doc.title}</h3>
-                <button onClick={() => editDocument(index)}>Edit</button>
-                <button onClick={() => deleteDocument(index)}>Delete</button>
+                <h3
+                  onClick={() =>
+                    setShowDocument(showDocument === index ? null : index)
+                  }
+                  className={styles.documentTitle}
+                >
+                  {doc.title}
+                </h3>
+                <Button onClick={() => editDocument(index)}>Edit</Button>
+                <Button onClick={() => deleteDocument(index)}>Delete</Button>
               </>
+            )}
+            {showDocument === index && (
+              <div>
+                <ReactQuill value={doc.content} readOnly />
+                <Button
+                  onClick={() => editDocument(index)}
+                  className={styles.addButton}
+                >
+                  Edit
+                </Button>
+                <Button
+                  onClick={() => deleteDocument(index)}
+                  className={styles.addButton}
+                >
+                  Delete
+                </Button>
+              </div>
             )}
           </li>
         ))}
