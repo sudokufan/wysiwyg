@@ -1,5 +1,7 @@
 // src/DocumentManager.js
 import React, { useState } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const DocumentManager = () => {
   const [documents, setDocuments] = useState([]);
@@ -36,10 +38,9 @@ const DocumentManager = () => {
       <h1>Document Manager</h1>
 
       <div>
-        <input
-          type="text"
+        <ReactQuill
           value={newDocument}
-          onChange={(e) => setNewDocument(e.target.value)}
+          onChange={setNewDocument}
           placeholder="New Document"
         />
         <button onClick={handleAddDocument}>Add Document</button>
@@ -50,16 +51,12 @@ const DocumentManager = () => {
           <li key={index}>
             {editingIndex === index ? (
               <>
-                <input
-                  type="text"
-                  value={editingText}
-                  onChange={(e) => setEditingText(e.target.value)}
-                />
+                <ReactQuill value={editingText} onChange={setEditingText} />
                 <button onClick={handleSaveEdit}>Save</button>
               </>
             ) : (
               <>
-                {doc}
+                <div dangerouslySetInnerHTML={{ __html: doc }} />
                 <button onClick={() => handleEditDocument(index)}>Edit</button>
                 <button onClick={() => handleDeleteDocument(index)}>
                   Delete
