@@ -10,6 +10,7 @@ import {
 } from "../helpers/documentHelpers";
 
 import styles from "../styles/documentManager.module.css";
+import Button from "../components/Button";
 
 const DocumentManager = () => {
   const [documents, setDocuments] = useState([]);
@@ -68,6 +69,7 @@ const DocumentManager = () => {
       <div>
         <input
           type="text"
+          className={styles.title}
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           placeholder="Document Title"
@@ -77,7 +79,7 @@ const DocumentManager = () => {
           onChange={setNewDocument}
           placeholder="New Document"
         />
-        <button onClick={addDocument}>Add Document</button>
+        <Button onClick={addDocument}>Add Document</Button>
       </div>
 
       <div>
@@ -98,6 +100,7 @@ const DocumentManager = () => {
                   type="text"
                   value={editingTitle}
                   onChange={(e) => setEditingTitle(e.target.value)}
+                  placeholder="Edit Title"
                 />
                 <ReactQuill value={editingText} onChange={setEditingText} />
                 <button onClick={saveEdit}>Save</button>
@@ -105,7 +108,6 @@ const DocumentManager = () => {
             ) : (
               <>
                 <h3>{doc.title}</h3>
-                <div dangerouslySetInnerHTML={{ __html: doc.content }} />
                 <button onClick={() => editDocument(index)}>Edit</button>
                 <button onClick={() => deleteDocument(index)}>Delete</button>
               </>

@@ -1,3 +1,10 @@
 .documents {
   list-style-type: none;
 }
+
+.title {
+  border: none;
+  background: transparent;
+  font-size: 32px;
+  width: 100%;
+}
