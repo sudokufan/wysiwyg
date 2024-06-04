@@ -1,6 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
-import DocumentManager from "./documentManager";
+import DocumentManager from "./pages/documentManager";
 
 function App() {
   return (
