@@ -64,9 +64,11 @@ const DocumentManager = () => {
   };
 
   const filteredDocuments = useMemo(() => {
-    return documents.filter((doc) =>
-      doc.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    return documents
+      .map((doc, index) => ({ ...doc, originalIndex: index }))
+      .filter((doc) =>
+        doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
   }, [searchQuery, documents]);
 
   return (
@@ -109,23 +111,27 @@ const DocumentManager = () => {
           <h2>Saved Documents</h2>
 
           <ul className={styles.documents}>
-            {filteredDocuments.map((doc, index) => (
-              <li key={index}>
+            {filteredDocuments.map((doc) => (
+              <li key={doc.originalIndex}>
                 {showDocumentEditor && (
                   <>
                     <div>{doc.title}</div>
                     <Button
                       onClick={() => {
-                        setShowDocument(showDocument === index ? null : index);
+                        setShowDocument(
+                          showDocument === doc.originalIndex
+                            ? null
+                            : doc.originalIndex
+                        );
                       }}
                     >
                       View
                     </Button>
                   </>
                 )}
-                {showDocument === index && (
+                {showDocument === doc.originalIndex && (
                   <div>
-                    {editingIndex === index ? (
+                    {editingIndex === doc.originalIndex ? (
                       <>
                         <input
                           type="text"
@@ -156,12 +162,14 @@ const DocumentManager = () => {
                         <Button
                           onClick={() => {
                             setShowDocumentEditor(false);
-                            editDocument(index);
+                            editDocument(doc.originalIndex);
                           }}
                         >
                           Edit
                         </Button>
-                        <Button onClick={() => deleteDocument(index)}>
+                        <Button
+                          onClick={() => deleteDocument(doc.originalIndex)}
+                        >
                           Delete
                         </Button>
                       </>
