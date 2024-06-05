@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import {
-  handleAddDocument,
-  handleEditDocument,
-  handleSaveEdit,
-  handleSearch,
-} from "../helpers/documentHelpers";
 
 import styles from "../styles/documentManager.module.css";
 import Button from "../components/Button";
@@ -14,8 +8,12 @@ import Button from "../components/Button";
 const DocumentManager = () => {
   // document storage
   const [documents, setDocuments] = useState([]);
-  const [newDocument, setNewDocument] = useState("");
+
+  // new doc creation
   const [newTitle, setNewTitle] = useState("");
+  const [newDocument, setNewDocument] = useState("");
+
+  // doc editing
   const [editingIndex, setEditingIndex] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
   const [editingText, setEditingText] = useState("");
@@ -28,20 +26,23 @@ const DocumentManager = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const addDocument = () => {
-    let updatedDocuments = handleAddDocument(documents, newTitle, newDocument);
-    setDocuments(updatedDocuments);
-    setNewTitle("");
-    setNewDocument("");
+    if (newTitle !== "" && newDocument.trim() !== "") {
+      let updatedDocuments = [
+        ...documents,
+        { title: newTitle, content: newDocument },
+      ];
+      setDocuments(updatedDocuments);
+      setNewTitle("");
+      setNewDocument("");
+    } else {
+      console.log("incomplete");
+    }
   };
 
   const editDocument = (index) => {
-    const { editingIndex, editingTitle, editingText } = handleEditDocument(
-      documents,
-      index
-    );
-    setEditingIndex(editingIndex);
-    setEditingTitle(editingTitle);
-    setEditingText(editingText);
+    setEditingIndex(index);
+    setEditingTitle(documents[index].title);
+    setEditingText(documents[index].content);
   };
 
   const deleteDocument = (index) => {
@@ -50,19 +51,21 @@ const DocumentManager = () => {
   };
 
   const saveEdit = () => {
-    let updatedDocuments = handleSaveEdit(
-      documents,
-      editingIndex,
-      editingTitle,
-      editingText
+    let updatedDocuments = documents.map((doc, index) =>
+      index === editingIndex
+        ? { title: editingTitle, content: editingText }
+        : doc
     );
+
     setDocuments(updatedDocuments);
     setEditingIndex(null);
     setEditingTitle("");
     setEditingText("");
   };
 
-  const filteredDocuments = handleSearch(documents, searchQuery);
+  const filteredDocuments = documents.filter((doc) =>
+    doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div>
@@ -93,6 +96,7 @@ const DocumentManager = () => {
       <div>
         <input
           type="text"
+          disabled={documents.length === 0}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search by Title"
@@ -111,7 +115,14 @@ const DocumentManager = () => {
                   placeholder="Edit Title"
                 />
                 <ReactQuill value={editingText} onChange={setEditingText} />
-                <button onClick={saveEdit}>Save</button>
+                <Button
+                  onClick={() => {
+                    setShowDocumentEditor(true);
+                    saveEdit();
+                  }}
+                >
+                  Save Changes
+                </Button>
               </>
             ) : (
               <>
@@ -127,8 +138,15 @@ const DocumentManager = () => {
             )}
             {showDocument === index && (
               <div>
-                <ReactQuill value={doc.content} readOnly />
-                <Button onClick={() => editDocument(index)}>Edit</Button>
+                <div dangerouslySetInnerHTML={{ __html: doc.content }} />
+                <Button
+                  onClick={() => {
+                    setShowDocumentEditor(false);
+                    editDocument(index);
+                  }}
+                >
+                  Edit
+                </Button>
                 <Button onClick={() => deleteDocument(index)}>Delete</Button>
               </div>
             )}
