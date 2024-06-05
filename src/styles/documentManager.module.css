@@ -1,5 +1,17 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 80px;
+}
+
 .documents {
+  display: flex;
+  gap: 100px;
   list-style-type: none;
+}
+
+.document {
+  font-size: 14px;
 }
 
 .title {

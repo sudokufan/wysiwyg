@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
@@ -63,96 +63,116 @@ const DocumentManager = () => {
     setEditingText("");
   };
 
-  const filteredDocuments = documents.filter((doc) =>
-    doc.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredDocuments = useMemo(() => {
+    return documents.filter((doc) =>
+      doc.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, documents]);
 
   return (
-    <div>
-      <h1>Document Manager</h1>
+    <div className={styles.container}>
+      <div>
+        <h1>Document Manager</h1>
 
-      {showDocumentEditor ? (
+        {showDocumentEditor && (
+          <div>
+            <input
+              type="text"
+              className={styles.title}
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              placeholder="Document Title"
+            />
+            <ReactQuill
+              value={newDocument}
+              onChange={setNewDocument}
+              placeholder="New Document"
+            />
+            <Button onClick={addDocument}>Save</Button>
+          </div>
+        )}
+      </div>
+
+      {documents.length !== 0 && (
         <div>
           <input
             type="text"
-            className={styles.title}
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-            placeholder="Document Title"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search Titles"
           />
-          <ReactQuill
-            value={newDocument}
-            onChange={setNewDocument}
-            placeholder="New Document"
-          />
-          <Button onClick={addDocument}>Save</Button>
         </div>
-      ) : (
-        <Button onClick={() => setShowDocumentEditor(showDocument === false)}>
-          Add Document
-        </Button>
       )}
 
-      <div>
-        <input
-          type="text"
-          disabled={documents.length === 0}
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search by Title"
-        />
-      </div>
+      {documents.length !== 0 && (
+        <div>
+          <h2>Saved Documents</h2>
 
-      <ul className={styles.documents}>
-        {filteredDocuments.map((doc, index) => (
-          <li key={index}>
-            {editingIndex === index ? (
-              <>
-                <input
-                  type="text"
-                  value={editingTitle}
-                  onChange={(e) => setEditingTitle(e.target.value)}
-                  placeholder="Edit Title"
-                />
-                <ReactQuill value={editingText} onChange={setEditingText} />
-                <Button
-                  onClick={() => {
-                    setShowDocumentEditor(true);
-                    saveEdit();
-                  }}
-                >
-                  Save Changes
-                </Button>
-              </>
-            ) : (
-              <>
-                <div>{doc.title}</div>
-                <Button
-                  onClick={() => {
-                    setShowDocument(showDocument === index ? null : index);
-                  }}
-                >
-                  View
-                </Button>
-              </>
-            )}
-            {showDocument === index && (
-              <div>
-                <div dangerouslySetInnerHTML={{ __html: doc.content }} />
-                <Button
-                  onClick={() => {
-                    setShowDocumentEditor(false);
-                    editDocument(index);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button onClick={() => deleteDocument(index)}>Delete</Button>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+          <ul className={styles.documents}>
+            {filteredDocuments.map((doc, index) => (
+              <li key={index}>
+                {showDocumentEditor && (
+                  <>
+                    <div>{doc.title}</div>
+                    <Button
+                      onClick={() => {
+                        setShowDocument(showDocument === index ? null : index);
+                      }}
+                    >
+                      View
+                    </Button>
+                  </>
+                )}
+                {showDocument === index && (
+                  <div>
+                    {editingIndex === index ? (
+                      <>
+                        <input
+                          type="text"
+                          className={styles.title}
+                          value={editingTitle}
+                          onChange={(e) => setEditingTitle(e.target.value)}
+                          placeholder="Edit Title"
+                        />
+                        <ReactQuill
+                          value={editingText}
+                          onChange={setEditingText}
+                        />
+                        <Button
+                          onClick={() => {
+                            setShowDocumentEditor(true);
+                            saveEdit();
+                          }}
+                        >
+                          Save Changes
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <div
+                          className={styles.document}
+                          dangerouslySetInnerHTML={{ __html: doc.content }}
+                        />
+                        <Button
+                          onClick={() => {
+                            setShowDocumentEditor(false);
+                            editDocument(index);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button onClick={() => deleteDocument(index)}>
+                          Delete
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
