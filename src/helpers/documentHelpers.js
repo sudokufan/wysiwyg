@@ -3,10 +3,6 @@ export const handleAddDocument = (documents, newTitle, newDocument) => {
   return [...documents, { title: newTitle, content: newDocument }];
 };
 
-export const handleDeleteDocument = (documents, index) => {
-  return documents.filter((_, i) => i !== index);
-};
-
 export const handleEditDocument = (documents, index) => {
   return {
     editingIndex: index,
